@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+	<mvc:annotation-driven />
+	<context:component-scan base-package="com.scnu.lab.*">
+        <context:exclude-filter type="annotation" 
+        		expression="org.springframework.stereotype.Service" />           
+	</context:component-scan>
+	
+	<mvc:resources mapping="/assets/**" location="/assets/"/>
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/pages/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<!-- 异常处理 -->
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<prop key="NumberFormatException">/common/sys_error</prop><!-- 表示当抛出NumberFormatException的时候就返回名叫number的视图 -->
+				<prop key="NullPointerException">/common/sys_error</prop>
+			</props>
+		</property>
+		<!-- 表示当抛出异常但没有在exceptionMappings里面找到对应的异常时 
+			返回名叫exception的视图 -->
+		<property name="defaultErrorView" value="/common/sys_error" />
+		<!-- 定义异常处理页面用来获取异常信息的变量名，默认名为exception -->  
+    	<property name="exceptionAttribute" value="ex"></property>  
+	</bean>
+	
+	<!-- 过滤器 -->
+ 	<mvc:interceptors>
+ 		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:exclude-mapping path="/assets/**"/>
+			<mvc:exclude-mapping path="/wx/**"/>
+			<bean class="com.scnu.lab.intercepter.WeixinValidateInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors> 
+</beans>
